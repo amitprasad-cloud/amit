@@ -16,25 +16,6 @@ class Admin_model extends CI_Model {
         $this->load->database();	
     }
 	
-	
-	/**
-     * get student feedback
-     */
-
-    
-	/*function get_all($table) 
-    {
-         $query = $this->db->get($table);
-         return $query->result();
-    }    
-
-   function get_where($table, $where = '') 
-    {
-        $query = $this->db->get_where($table, $where); 
-            return $query->result_array();
-        
-    }*/
-
     function get_where($table, $where = '',$action) 
     {
         $query = $this->db->get_where($table, $where); 
