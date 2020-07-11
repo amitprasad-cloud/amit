@@ -93,7 +93,7 @@ class Welcome extends CI_Controller {
                 	$this->session->set_userdata('usersdata', $usersdata);
 
                 	//maill to all(user and freinds)
-                	$mailall  = $this->compose_signupmail();
+                	$mailall  = $this->compose_signupmail('all');
                     $redirectthankyou = 'true';
 
 					if($redirectthankyou){
@@ -172,24 +172,47 @@ class Welcome extends CI_Controller {
 					foreach($guests as $guest){
 
                         //post data
+                        $user         = array();
 						$firstname    = $guest['firstName'];
 					    $lastname     = $guest['lastName'];
 					    $email        = $guest['email'];
 					    $rnd          = rand(1000,9999);
 					    $barcode      = $this->barcode_generate($rnd);
-
+                     
                         //make array of guest
-					    array_push($usersdata,array('firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode));
+                        $user = array('firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode);
+					    array_push($usersdata,$user);
 
-					    $data = array('userid'=>$id,'firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode,'status'=>'1','createddate'=>$date);
+                      //send mail to user
+					    if(true){
 
+							    //view data
+			                  	$content_data = array(
+							         'userguest'   => $user,
+							         'freinds'    => array()
+								);
+			 
+			                    //get message template
+						    	$message = $this->load->view('htmlmail',$content_data,true); 
+						    	//send mail
+			                    $this->send_mail($user['email'],$message);
+
+	                    }
+
+
+					    
 					    //insert data
+					    $data = array('userid'=>$id,'firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode,'status'=>'1','createddate'=>$date);
 				        $insert = $this->Welcome_model->insert("freinds",$data);
 
 					}
                     
                     //set seesion userdata array
 					 $this->session->set_userdata('usersdata', $usersdata);  
+
+					 //maill to main user
+					 $temp = '';
+					 $mailall  = $this->compose_signupmail($temp);
 
 					 //redirect
 					  redirect('thank-you'); 
@@ -228,7 +251,7 @@ class Welcome extends CI_Controller {
 	    return $brcodeimg;
 	}
 
-   public function compose_signupmail(){
+   public function compose_signupmail($action){
 			            
    	    if($this->session->has_userdata('usersdata')){
 
@@ -246,17 +269,19 @@ class Welcome extends CI_Controller {
                   }
                   else{
 
-                  	//view data
-                  	$content_data = array(
-				         'userguest'   => $user,
-				         'freinds'    => array()
-					);
- 
-                    //get message template
-			    	$message = $this->load->view('htmlmail',$content_data,true); 
-			    	
-			    	//send mail
-                    $this->send_mail($user['email'],$message);
+                  	    if($action == 'all'){
+		                  	//view data
+		                  	$content_data = array(
+						         'userguest'   => $user,
+						         'freinds'    => array()
+							);
+		 
+		                    //get message template
+					    	$message = $this->load->view('htmlmail',$content_data,true); 
+					    	//send mail
+		                    $this->send_mail($user['email'],$message);
+
+					    }
                   	array_push($freinds,$user);
                 }
             }
