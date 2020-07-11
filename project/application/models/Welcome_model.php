@@ -16,10 +16,7 @@ class Welcome_model extends CI_Model {
         $this->load->database();	
     }
 	
-	
-	/**
-     * get student feedback
-     */
+
     function insert($table,$data)
     {
         $this->db->insert($table, $data);

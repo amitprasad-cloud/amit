@@ -28,15 +28,20 @@
 		/**
 		 * Change session language - user selected
 		 */
+
+		//check to duplicate email
 		public function search_email()  
 		{  
 
-
+            //post data
             $email = $_POST['email'];
 			$where = array('email'=>$email);
+
+			//get data
 			$get_lists = $this->Ajax_model->get_where("users",$where,'count'); 
 
-
+           
+            //check data
 			if($get_lists >= '0') {
 				$output = array('status'=>'success','count'=>$get_lists);  
 			}
@@ -45,6 +50,7 @@
 
 			}
 
+            //return data
 			$data['result'] = $output;
 			echo json_encode($data);
 

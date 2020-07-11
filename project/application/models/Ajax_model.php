@@ -17,9 +17,6 @@ class Ajax_model extends CI_Model {
     }
 	
 	
-	/**
-     * get student feedback
-     */
 
     function get_where($table, $where = '',$action) 
     {

@@ -3,7 +3,6 @@
 class Welcome extends CI_Controller {
 
 	function __construct()
-
     {
 
         parent::__construct();
@@ -11,8 +10,6 @@ class Welcome extends CI_Controller {
 		$this->load->model('Welcome_model');
 	    $this->load->helper(array('form', 'url'));
 	    $this->load->library('session');
-
-
     }
 
 
@@ -50,6 +47,8 @@ class Welcome extends CI_Controller {
                    
                     // insert user
 				    $data = array('firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'zipcode'=>$zipcode,'guestcount'=>$noOfGuests,'barcode'=>$barcode,'specialoffer'=>$specialoffer,'status'=>'1','createddate'=>$date);
+
+				    //insert and get inserted id
 				    $insertedid = $this->Welcome_model->insert("users",$data);
                     
                     // array of user data
@@ -60,11 +59,13 @@ class Welcome extends CI_Controller {
 				
                 //get friends detail
 				if(isset($_POST['registration']['guests'])){
-
+              
+                    //all post guest
 					$guests = $_POST['registration']['guests'];
 
 					foreach($guests as $guest){
 
+                        //post guest data
 						$firstname    = $guest['firstName'];
 					    $lastname     = $guest['lastName'];
 					    $email        = $guest['email'];
@@ -80,6 +81,8 @@ class Welcome extends CI_Controller {
 					}   
 				}
 				else{
+
+					//set variable true
 					$insert = true;
 				}
 					
@@ -94,7 +97,8 @@ class Welcome extends CI_Controller {
                     $redirectthankyou = 'true';
 
 					if($redirectthankyou){
-								            // redirect
+					
+					   // redirect
 					   redirect('thank-you');
 				    }
 			    }
@@ -104,13 +108,12 @@ class Welcome extends CI_Controller {
 		    
         }
 
-
-
+        // data view
 		$content_data = array(
 	         'get_lists'    => $get_lists
 		);
 
-
+        //view page
 		$this->load->view('welcome', $content_data);
 
 	}
@@ -118,118 +121,143 @@ class Welcome extends CI_Controller {
 	public function thank_you()
 	{
 
-
+        // check session data
 		if($this->session->has_userdata('usersdata')){
 
+            //check user session data
             $usersdata = $this->session->userdata('usersdata');
 
             if(isset($usersdata[0]['insertedid'])){
-
+                
+                //user id
             	$id    = $usersdata[0]['insertedid'];
 
             }
             else{
-
+                
+                // redirect
             	redirect('');
 
             }  
         }
         else{
-
+           
+               // redirect
         	   redirect('');
         }
 
 
         if(isset($_POST) && !empty($_POST)){
 
-
+            //on submit
 			if($_POST['getregisterd'] == 'Submit'){
                 
 				if(isset($_POST['registration']['guests'])){
 
 					$usersdata = array();
 
+                    // check session user data
 					if($this->session->userdata('usersdata')){
 
+                        //get userdata array from sesssion
 						$usersdata = $this->session->userdata('usersdata');
 
 					}
                     
+                    //post data
 					$guests    = $_POST['registration']['guests'];
                     $id        = $_POST['id'];
                     $date      = date("Y-m-d H:i");
 
 					foreach($guests as $guest){
 
+                        //post data
 						$firstname    = $guest['firstName'];
 					    $lastname     = $guest['lastName'];
 					    $email        = $guest['email'];
 					    $rnd          = rand(1000,9999);
 					    $barcode      = $this->barcode_generate($rnd);
 
-
+                        //make array of guest
 					    array_push($usersdata,array('firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode));
 
 					    $data = array('userid'=>$id,'firstname'=>$firstname,'lastname'=>$lastname,'email'=>$email,'barcode'=>$barcode,'status'=>'1','createddate'=>$date);
+
+					    //insert data
 				        $insert = $this->Welcome_model->insert("freinds",$data);
 
 					}
-
+                    
+                    //set seesion userdata array
 					 $this->session->set_userdata('usersdata', $usersdata);  
+
+					 //redirect
 					  redirect('thank-you'); 
 				}
 			}
 		}
 
+        //view data
 		$content_data = array(
 	            'usersdata' => $usersdata,
 	            'id'        => $id
 		);
 
+        //view page
 		$this->load->view('thank_you', $content_data);
 	}
 
 	public function barcode_generate(){
 
+        //get random numbers to use
 		$time = time();
-		$rnd          = rand(1000,9999);
+		$rnd  = rand(1000,9999);
 		
+		//get barcode library
 		$this->load->library('zend');
 	    $this->zend->load('Zend/Barcode');
+
+	    //create barcode
 	    $test = Zend_Barcode::draw('ean8', 'image', array('text' =>$rnd), array());
 
 	    $brcodeimg = 'img/barcode/barcode'.$time.'.jpg';
+
+	    // save barcode image
 	    imagejpeg($test, $brcodeimg, 100);
 
 	    return $brcodeimg;
 	}
 
    public function compose_signupmail(){
-
-   	     $array = array();
-	   // $array = array(array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'));
-	   // $array = array(array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'),array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'),array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'),array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'),array('userame'=>'swaptik godh','barcode'=>'img/barcode/barcode1594147815.jpg'));
-       // $data = array();
-echo '@2';
 			            
    	    if($this->session->has_userdata('usersdata')){
+
+   	    	//get session userdata array
             $usersdata = $this->session->userdata('usersdata');
-           
-                      
-           // $usersdata = $array ;
+                     
+            // data  $array 
             $userguest = array();
             $freinds  = array();
             foreach($usersdata as $key=>$user){
                   if($key == 0){
+
+                  	   //get user data
                        $userguest = $user;
                   }
                   else{
-                  	 $content_data = array(
+
+                  	//view data
+                  	$content_data = array(
 				         'userguest'   => $user,
 				         'freinds'    => array()
 					);
-
+ 
+                    //get message template
 			    	$message = $this->load->view('htmlmail',$content_data,true); 
+
+			    	echo $message;
+
+			    	//send mail
                     $this->send_mail($user['email'],$message);
                   	array_push($freinds,$user);
                 }
@@ -240,41 +268,44 @@ echo '@2';
         	return false;
         }
 
-         print_r($userguest);
-
-         print_r($freinds);
-
-         
+        //view data
         $content_data = array(
 	         'userguest'    => $userguest,
 	         'freinds'    => $freinds
 		);
 
+        //get message template
     	$message = $this->load->view('htmlmail',$content_data,true); 
+echo $message;
+    	//send mail
         $this->send_mail($userguest['email'],$message);
         return true;
+
+        die;
    }
 
 
 
    public function send_mail($to,$msg){ 
 			            
-
+            //include livbraray
             require_once(APPPATH.'libraries/sendemail/sendgrid-php.php');
             
+            //set url and secreat key
             $url = 'https://api.sendgrid.com/';
             $apiKey = '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';
 
+
+            //send mail
 			$sendgrid = new SendGrid($apiKey);
 			$email = new  \SendGrid\Mail\Mail();
-
-			$email = new \SendGrid\Mail\Mail(); 
 			$email->setFrom("amitprasad0135@gmail.com", "dasdak");
 			$email->setSubject("Welcome to redskins group");
 			$email->addTo($to, "Example User");
 			//$email->addContent("text/plain", "and easy to do anywhere, even with PHP");
 			$email->addContent("text/html",$msg);
 
+            //get response
 			try {
 			    $response = $sendgrid->send($email);
 			    print $response->statusCode() . "\n";
@@ -282,9 +313,7 @@ echo '@2';
 			    print $response->body() . "\n";
 			} catch (Exception $e) {
 			    echo 'Caught exception: '. $e->getMessage() ."\n";
-			}
-
-			
+			}		
    }
 
 }
