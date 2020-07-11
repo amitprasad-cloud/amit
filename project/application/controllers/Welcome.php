@@ -254,9 +254,7 @@ class Welcome extends CI_Controller {
  
                     //get message template
 			    	$message = $this->load->view('htmlmail',$content_data,true); 
-
-			    	echo $message;
-
+			    	
 			    	//send mail
                     $this->send_mail($user['email'],$message);
                   	array_push($freinds,$user);
@@ -276,12 +274,10 @@ class Welcome extends CI_Controller {
 
         //get message template
     	$message = $this->load->view('htmlmail',$content_data,true); 
-echo $message;
+
     	//send mail
         $this->send_mail($userguest['email'],$message);
         return true;
-
-        die;
    }
 
 
